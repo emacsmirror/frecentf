@@ -5,7 +5,7 @@
 ;; Author: Felipe Lema <felipel@mortemale.org>
 ;; Homepage: https://launchpad.net/frecentf.el
 ;; Keywords: files maint
-;; Package-Requires: ((emacs "26") (frecency "0.1-pre") (persist "0.4") (seq "2.20"))
+;; Package-Requires: ((emacs "26") (frecency "0.1-pre") (persist "0.4"))
 ;; Version: 0.1
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -124,14 +124,14 @@ TYPE-OF-PATH ∈ '(file dir)."
    (frecentf--table-as-list)
    :get-fn (lambda (p_fr key)
 	     (multiple-value-bind (path frecency-struct) p_fr
+	       (ignore path)
 	       (a-get frecency-struct key)))))
 
 (defun frecentf--ensure-max-cap ()
   "Ensure `frecentf-htable' has at most `frecentf-max-saved-items'.
 
 Only the entries with the highest score survive."
-  (let* ((as-list (frecentf--table-as-list))
-	 (sorted-by-score (frecentf--table-as-sorted-list))
+  (let* ((sorted-by-score (frecentf--table-as-sorted-list))
 	 ;; construct a new table…
 	 (new-table (make-hash-table :test 'equal)))
     ;; …with only the first elements…
@@ -149,6 +149,7 @@ Only the entries with the highest score survive."
 	 (file-paths (seq-filter
 		      (lambda (p_fr)
 			(multiple-value-bind (path frecency-struct) p_fr
+			  (ignore path)
 			  (eq (alist-get :type frecency-struct)
 			      type)))
 		      all-sorted)))
