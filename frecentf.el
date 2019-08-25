@@ -153,6 +153,7 @@ Only the entries with the highest score survive."
 			  (eq (alist-get :type frecency-struct)
 			      type)))
 		      all-sorted)))
+    (ignore ivy-sort-functions-alist)
     (if (not file-paths)
 	(throw 'no-files)
       (if-let ((picked-file
