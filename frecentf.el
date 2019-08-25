@@ -90,8 +90,8 @@ Based off `recentf-track-opened-file'"
   "Add a PATH to `frecentf-htable' with an associated TYPE-OF-PATH.
 
 TYPE-OF-PATH ∈ '(file dir)."
-  (assert (symbolp type-of-path))
-  (assert (cl-find type-of-path '(file dir)))
+  (cl-assert (symbolp type-of-path))
+  (cl-assert (cl-find type-of-path '(file dir)))
   ;; don't add if entry is within any to-be-filtered
   (unless (seq-find (lambda (prefix)
 		      (string-prefix-p prefix path))
@@ -123,7 +123,7 @@ TYPE-OF-PATH ∈ '(file dir)."
   (frecency-sort
    (frecentf--table-as-list)
    :get-fn (lambda (p_fr key)
-	     (multiple-value-bind (path frecency-struct) p_fr
+	     (cl-multiple-value-bind (path frecency-struct) p_fr
 	       (ignore path)
 	       (a-get frecency-struct key)))))
 
@@ -148,7 +148,7 @@ Only the entries with the highest score survive."
 	 (all-sorted (frecentf--table-as-sorted-list))
 	 (file-paths (seq-filter
 		      (lambda (p_fr)
-			(multiple-value-bind (path frecency-struct) p_fr
+			(cl-multiple-value-bind (path frecency-struct) p_fr
 			  (ignore path)
 			  (eq (alist-get :type frecency-struct)
 			      type)))
