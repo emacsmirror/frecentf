@@ -5,7 +5,7 @@ Access [[https://en.wikipedia.org/wiki/Frecency][frecently]] visited files and d
 (like =recentf=, but using frecency score)
 
 * Installation
-  
+
 I recommend you install everything with =straight=.
 
 Pre-requisites:
