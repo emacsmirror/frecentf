@@ -99,11 +99,11 @@ Based off `recentf-track-opened-file'"
 (defun frecentf--add-entry (path type-of-path)
   "Add a PATH to `frecentf-htable' with an associated TYPE-OF-PATH.
 
-TYPE-OF-PATH ∈ '(file dir).
+TYPE-OF-PATH in '(file dir).
 
 If PATH is prefixed by any of `frecentf-ignore-paths', it won't be added."
   (cl-assert (symbolp type-of-path))
-  (cl-assert (cl-find type-of-path '(file dir)))
+  (cl-assert (member type-of-path '(file dir)))
   ;; don't add if entry is within any to-be-filtered
   (unless (seq-find (lambda (prefix)
 		      (string-prefix-p prefix path))
@@ -111,7 +111,7 @@ If PATH is prefixed by any of `frecentf-ignore-paths', it won't be added."
     (let* ((original-entry (gethash path frecentf-htable
 				    (a-list :type type-of-path)))
 	   (updated-entry (frecency-update
-			   original-entry)))
+			    original-entry)))
       ;; ensure path has its type updated in the very rare cases it's changed
       (setf (alist-get :type updated-entry)
 	    type-of-path)
@@ -119,25 +119,15 @@ If PATH is prefixed by any of `frecentf-ignore-paths', it won't be added."
     ;; entry added, ensure post-condition
     (frecentf--ensure-max-cap)))
 
-(defun frecentf--table-as-list ()
-  "Return `frecentf-htable' as list."
-  (let (collected)
-    (maphash
-     (lambda (key frecency-struct)
-       (push (list key frecency-struct)
-	     collected))
-     frecentf-htable)
-    collected))
-
 (defun frecentf--table-as-sorted-list ()
   "Return `frecentf-htable' as list."
-
   (frecency-sort
-   (frecentf--table-as-list)
-   :get-fn (lambda (p_fr key)
-	     (cl-multiple-value-bind (path frecency-struct) p_fr
-	       (ignore path)
-	       (a-get frecency-struct key)))))
+   (map-into
+    frecentf-htable
+    'list)
+   :get-fn (lambda (entry key)
+	     (pcase-let ((`(,path . ,info) entry))
+	       (a-get info key)))))
 
 (defun frecentf--ensure-max-cap ()
   "Ensure `frecentf-htable' has at most `frecentf-max-saved-items'.
