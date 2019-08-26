@@ -126,7 +126,7 @@ If PATH is prefixed by any of `frecentf-ignore-paths', it won't be added."
     frecentf-htable
     'list)
    :get-fn (lambda (entry key)
-	     (pcase-let ((`(,path . ,info) entry))
+	     (pcase-let ((`(,_path . ,info) entry))
 	       (a-get info key)))))
 
 (defun frecentf--ensure-max-cap ()
@@ -153,10 +153,9 @@ Returns a path as string, otherwise:
   (let* ((ivy-sort-functions-alist nil)
 	 (all-sorted (frecentf--table-as-sorted-list))
 	 (file-paths (seq-filter
-		      (lambda (p_fr)
-			(cl-multiple-value-bind (path frecency-struct) p_fr
-			  (ignore path)
-			  (eq (alist-get :type frecency-struct)
+		      (lambda (entry)
+			(pcase-let ((`(,_path . ,info) entry))
+			  (eq (alist-get :type info)
 			      type)))
 		      all-sorted)))
     (ignore ivy-sort-functions-alist)
@@ -183,10 +182,10 @@ Returns a path as string, otherwise:
 	    ;; return the pick (no guarantee that `action' will do so)
 	    picked-file)
 	'no-pick))))
-
 ;;; hooks
 (add-hook 'find-file-hook #'frecentf-track-opened-file)
 (add-hook 'write-file-functions #'frecentf-track-opened-file)
+
 
 ;;; official API
 
