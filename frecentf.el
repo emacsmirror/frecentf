@@ -137,8 +137,8 @@ Only the entries with the highest score survive."
 	 ;; construct a new table…
 	 (new-table (make-hash-table :test 'equal)))
     ;; …with only the first elements…
-    (cl-loop for (path frecency-struct) in (seq-take sorted-by-score
-						     frecentf-max-saved-items)
+    (cl-loop for (path . frecency-struct) in (seq-take sorted-by-score
+						       frecentf-max-saved-items)
 	     do (puthash path frecency-struct new-table))
     ;; …and assign it
     (setq frecentf-htable
