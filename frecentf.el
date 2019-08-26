@@ -145,7 +145,11 @@ Only the entries with the highest score survive."
 	  new-table)))
 
 (defun frecentf--pick-by (type action)
-  "Pick a path that is of TYPE and call ACTION on it."
+  "Pick a path that is of TYPE and call ACTION on it.
+
+Returns a path as string, otherwise:
+- 'no-files when no files are currently stored
+- 'no-pick when `completing-read' returns null (probably cancelled by user)"
   (let* ((ivy-sort-functions-alist nil)
 	 (all-sorted (frecentf--table-as-sorted-list))
 	 (file-paths (seq-filter
@@ -157,7 +161,7 @@ Only the entries with the highest score survive."
 		      all-sorted)))
     (ignore ivy-sort-functions-alist)
     (if (not file-paths)
-	(throw 'no-files)
+	'no-files
       (if-let ((picked-file
 		(completing-read "frecent files: "
 				 (lambda (string pred action)
@@ -173,8 +177,12 @@ Only the entries with the highest score survive."
 							    pred))))
 				 nil
 				 t)))
-	  (funcall action picked-file)
-	(throw 'no-pick)))))
+	  (progn
+	    ;; `action' on pick
+	    (funcall action picked-file)
+	    ;; return the pick (no guarantee that `action' will do so)
+	    picked-file)
+	'no-pick))))
 
 ;;; hooks
 (add-hook 'find-file-hook #'frecentf-track-opened-file)
@@ -189,11 +197,10 @@ Only the entries with the highest score survive."
 When called interactively, call `find-file'"
   (interactive
    (list 'find-file))
-  (condition-case nil
-      (frecentf--pick-by 'file action)
-    (no-files
+  (pcase (frecentf--pick-by 'file action)
+    ('no-files
      (message "no saved files"))
-    (no-pick
+    ('no-pick
      (message "no file picked"))))
 
 ;;;###autoload
@@ -203,11 +210,10 @@ When called interactively, call `find-file'"
 When called interactively, call `dired'"
   (interactive
    (list 'dired))
-  (condition-case nil
-      (frecentf--pick-by 'dir action)
-    (no-files
+  (pcase (frecentf--pick-by 'dir action)
+    ('no-files
      (message "no saved directories"))
-    (no-pick
+    ('no-pick
      (message "no directory picked"))))
 
 (provide 'frecentf)
