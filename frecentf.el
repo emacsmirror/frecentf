@@ -51,13 +51,17 @@ A nil value means to save the whole list."
   :group 'frecentf
   :type 'integer)
 
-(defcustom frecentf-do-not-add-under-these (list
-					    (expand-file-name
-					     (concat
-					      user-emacs-directory
-					      "persp-confs")))
-  "Maximum number of items of the frecent list that will be saved.
-A nil value means to save the whole list."
+(defcustom frecentf-ignore-paths (list
+				  (expand-file-name
+				   (concat
+				    user-emacs-directory
+				    "persp-confs")))
+  "List of path prefixes that will be ignored.
+
+Be mindful that these paths will be tested by prefix, so if you have
+/some/path, then /some/path/inside/very/deep/inside/file will be ignored.
+
+See also `frecentf--add-entry'."
   :group 'frecentf
   :type '(repeat string))
 
@@ -71,7 +75,7 @@ Based off `recentf-track-opened-file'"
   ;; Must return nil because it is run from `write-file-functions'.
   nil)
 (defun frecentf-add-path (path)
-  "Add PATH and its directary."
+  "Add PATH and its directory."
   (if (file-directory-p path)
       (frecentf--add-directory path) ;; add path-as-directory
     ;; else, add the file path and its directory
@@ -89,17 +93,19 @@ Based off `recentf-track-opened-file'"
 (defun frecentf--add-entry (path type-of-path)
   "Add a PATH to `frecentf-htable' with an associated TYPE-OF-PATH.
 
-TYPE-OF-PATH ∈ '(file dir)."
+TYPE-OF-PATH ∈ '(file dir).
+
+If PATH is prefixed by any of `frecentf-ignore-paths', it won't be added."
   (cl-assert (symbolp type-of-path))
   (cl-assert (cl-find type-of-path '(file dir)))
   ;; don't add if entry is within any to-be-filtered
   (unless (seq-find (lambda (prefix)
 		      (string-prefix-p prefix path))
-		    frecentf-do-not-add-under-these)
+		    frecentf-ignore-paths)
     (let* ((original-entry (gethash path frecentf-htable
 				    (a-list :type type-of-path)))
 	   (updated-entry (frecency-update
-			    original-entry)))
+			   original-entry)))
       ;; ensure path has its type updated in the very rare cases it's changed
       (setf (alist-get :type updated-entry)
 	    type-of-path)
