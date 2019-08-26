@@ -182,10 +182,15 @@ Returns a path as string, otherwise:
 	    ;; return the pick (no guarantee that `action' will do so)
 	    picked-file)
 	'no-pick))))
-;;; hooks
-(add-hook 'find-file-hook #'frecentf-track-opened-file)
-(add-hook 'write-file-functions #'frecentf-track-opened-file)
 
+(defun frecentf-enabled-p ()
+  "Tell if frecentf is enabled by looking at hooks."
+  (seq-find
+   (lambda (hook)
+     (member 'frecentf-track-opened-file hook))
+   (list
+    find-file-hook
+    write-file-functions)))
 
 ;;; official API
 
@@ -214,6 +219,19 @@ When called interactively, call `dired'"
      (message "no saved directories"))
     ('no-pick
      (message "no directory picked"))))
+
+(define-minor-mode frecentf-mode
+  "Toggle frecentf mode.
+
+Mostly based off `recentf-mode'"
+  :global t
+  :group 'frecentf
+  (unless (and frecentf-mode (frecentf-enabled-p))
+    (let ((hook-setup (if frecentf-mode 'add-hook 'remove-hook)))
+      (dolist (hook '(find-file-hook
+		      write-file-functions))
+        (apply hook-setup (list hook
+				'frecentf-track-opened-file))))))
 
 (provide 'frecentf)
 ;;; frecentf.el ends here

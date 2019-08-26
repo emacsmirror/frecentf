@@ -1,0 +1,38 @@
+frecentf.el
+
+Access [[https://en.wikipedia.org/wiki/Frecency][frecently]] visited files and directories.
+
+(like =recentf=, but using frecency score)
+
+* Installation
+  
+I recommend you install everything with =straight=.
+
+Pre-requisites:
+#+begin_src emacs-lisp
+  (straight-use-package 'frecency)
+  (straight-use-package 'persist) ;; actually from elpa
+#+end_src
+
+Package
+#+begin_src emacs-lisp
+  (straight-use-package '(frecentf
+			  :type git
+			  :repo "https://git.launchpad.net/frecentf.el"))
+#+end_src
+
+* Usage
+
+Activate global mode like with =recentf=
+
+#+begin_src emacs-lisp
+  (frecentf-mode)
+#+end_src
+
+This will start saving files into a hash table that persists among sessions.
+Use the following commands to query / access entries. You may want to assign them to a key combination or a hydra
+
+#+begin_src emacs-lisp
+  (frecentf-pick-file)
+  (frecentf-pick-dir)
+#+end_src
