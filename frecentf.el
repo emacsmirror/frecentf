@@ -28,7 +28,6 @@
 ;; · simplified persistent list
 ;; · No entry is deleted when a buffer is killed (only when
 ;;   `frecentf-max-saved-items' is reached)
-;; · On each buffer added, its directory is also added
 
 ;;; Code:
 (require 'cl-lib)
@@ -65,6 +64,12 @@ See also `frecentf--add-entry'."
   :group 'frecentf
   :type '(repeat string))
 
+(defcustom frecentf-also-store-dirname nil
+  "When adding a file, will also add its dirname when this variable is non-nil."
+  :group 'frecentf
+  :type 'boolean)
+
+
 ;;; functions
 (defun frecentf-track-opened-file ()
   "Insert the name of the file just opened or written into the recent list.
@@ -76,7 +81,8 @@ Based off `recentf-track-opened-file'"
   nil)
 (defun frecentf-add-path (path)
   "Add PATH and its directory."
-  (if (file-directory-p path)
+  (if (and frecentf-also-store-dirname
+	   (file-directory-p path))
       (frecentf--add-directory path) ;; add path-as-directory
     ;; else, add the file path and its directory
     (frecentf--add-file path)
