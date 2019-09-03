@@ -32,6 +32,7 @@
 ;;; Code:
 (require 'cl-lib)
 (require 'frecency)
+(require 'map)
 (require 'persist)
 (require 'seq)
 
