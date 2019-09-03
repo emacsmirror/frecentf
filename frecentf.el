@@ -220,6 +220,7 @@ When called interactively, call `dired'"
     ('no-pick
      (message "no directory picked"))))
 
+;;;###autoload
 (define-minor-mode frecentf-mode
   "Toggle frecentf mode.
 
