@@ -35,6 +35,7 @@
 (require 'map)
 (require 'persist)
 (require 'seq)
+(require 'subr-x)
 
 ;;; Variables
 (persist-defvar frecentf-htable (make-hash-table :test 'equal)
