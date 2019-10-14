@@ -80,14 +80,17 @@ Based off `recentf-track-opened-file'"
     (frecentf-add-path buffer-file-name))
   ;; Must return nil because it is run from `write-file-functions'.
   nil)
+
 (defun frecentf-add-path (path)
-  "Add PATH and its directory."
-  (if (and frecentf-also-store-dirname
-	   (file-directory-p path))
-      (frecentf--add-directory path) ;; add path-as-directory
-    ;; else, add the file path and its directory
-    (frecentf--add-file path)
-    (frecentf--add-directory (file-name-directory path))))
+  "Add PATH and maybe its directory."
+  (if-let* ((basename (file-name-directory path))
+	    (_should-add-basename (and frecentf-also-store-dirname
+				       (file-directory-p basename))))
+      (frecentf--add-directory basename)) ;; add basename
+  ;; add the path, making distinction of whether it's a directory or file
+  (if (file-directory-p path)
+      (frecentf--add-directory path)
+    (frecentf--add-file path)))
 
 (defun frecentf--add-file (file-path)
   "Add FILE-PATH or update its timestamps if it's already been added."
