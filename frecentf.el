@@ -237,11 +237,7 @@ Mostly based off `recentf-mode'"
       (dolist (hook '(find-file-hook
 		      write-file-functions))
         (apply hook-setup (list hook
-				'frecentf-track-opened-file)))
-      (apply hook-setup
-	     'dirtrack-directory-change-hook
-	     (lambda ()
-	       (frecentf-add-path (eval 'default-directory)))))))
+				'frecentf-track-opened-file))))))
 
 (provide 'frecentf)
 ;;; frecentf.el ends here
