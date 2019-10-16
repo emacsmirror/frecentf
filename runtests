@@ -1,7 +1,17 @@
 #!/usr/bin/env zsh
+# following steps for having CI with travis:
+#  https://docs.travis-ci.com/user/deployment/launchpad/
+#  https://github.com/purcell/nix-emacs-ci#travis-usage
+#  https://github.com/marketplace/actions/set-up-emacs
+#  write tests
+#  run tests using buttercup-run-discover
 LE_EMACS=${EMACS:-emacs}
 
-$LE_EMACS -Q -batch \
-	  -l file1.el \
-	  -f load-test-env-and-buttercup-run-discover # TODO single func that runs buttercup-run-discover
-	  
+emacs_args=(
+    -Q -batch -nw
+    #-l file1.el
+    #-f load-test-env-and-buttercup-run-discover
+    --version
+)
+
+$LE_EMACS $emacs_args
