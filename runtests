@@ -1,8 +1,6 @@
 #!/usr/bin/env zsh
-# following steps for having CI with travis:
-#  https://docs.travis-ci.com/user/deployment/launchpad/
-#  https://github.com/purcell/nix-emacs-ci#travis-usage
-#  https://github.com/marketplace/actions/set-up-emacs
+# following steps for having CI
+#  ↳ https://powersj.io/post/launchpad-git-ci/
 #  write tests
 #  run tests using buttercup-run-discover
 LE_EMACS=${EMACS:-emacs}
