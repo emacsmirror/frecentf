@@ -5,7 +5,7 @@
 ;; Author: Felipe Lema <felipel@mortemale.org>
 ;; Homepage: https://launchpad.net/frecentf.el
 ;; Keywords: files maint
-;; Package-Requires: ((emacs "26") (frecency "0.1-pre") (persist "0.4"))
+;; Package-Requires: ((emacs "26.1") (frecency "0.1-pre") (persist "0.4"))
 ;; Version: 0.1
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -85,8 +85,8 @@ Based off `recentf-track-opened-file'"
 (defun frecentf-add-path (path)
   "Add PATH and maybe its directory."
   (if-let* ((basename (file-name-directory path))
-	    (_should-add-basename (and frecentf-also-store-dirname
-				       (file-directory-p basename))))
+	    (should-add-basename (and frecentf-also-store-dirname
+				      (file-directory-p basename))))
       (frecentf--add-directory basename)) ;; add basename
   ;; add the path, making distinction of whether it's a directory or file
   (if (file-directory-p path)
