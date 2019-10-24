@@ -1,6 +1,4 @@
 #!/usr/bin/env zsh
-# following steps for having CI
-#  ↳ https://powersj.io/post/launchpad-git-ci/
 #  write tests
 #  run tests using buttercup-run-discover
 LE_EMACS=${EMACS:-emacs}
