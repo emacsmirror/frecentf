@@ -5,9 +5,8 @@ LE_EMACS=${EMACS:-emacs}
 
 emacs_args=(
     -Q -batch -nw
-    #-l file1.el
-    #-f load-test-env-and-buttercup-run-discover
-    --version
+    -l frecentf-tests.el
+    -f buttercup-run-discover
 )
 
-$LE_EMACS $emacs_args
+exec $LE_EMACS $emacs_args
