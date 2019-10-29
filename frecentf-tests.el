@@ -72,11 +72,15 @@
 		 persist--directory-location)
 	   (setq
 	    persist--directory-location
-	    (locate-user-emacs-file "test-persist")))
+	    (locate-user-emacs-file "test-persist"))
+	   ;; turn on
+	   (frecentf-mode))
 	  (after-each
+	   ;; turn off
+	   (frecentf-mode)
 	   (delete-directory testing--persist--directory-location t))
-	  (it "turn on"
-	      (frecentf-mode)
+
+	  (it "add some directory"
 	      (let ((some-path testing--persist--directory-location))
 		(frecentf--add-directory some-path)
 		(let ((sorted-table (frecentf--table-as-sorted-list)))
@@ -84,7 +88,8 @@
 		  (pcase (frecentf--table-as-sorted-list)
 		    (`((,path . ,properties)) ;; signle-item alist
 		     (expect path :to-equal some-path)
-		     (expect (a-get properties :type) :to-equal 'dir)))))))
+		     (expect (a-get properties :type) :to-equal 'dir)))))
+	      ))
 
 
 (provide 'frecentf-tests)
