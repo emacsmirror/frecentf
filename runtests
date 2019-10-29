@@ -1,0 +1,12 @@
+#!/usr/bin/env zsh
+#  write tests
+#  run tests using buttercup-run-discover
+LE_EMACS=${EMACS:-emacs}
+
+emacs_args=(
+    -Q -batch -nw
+    -l frecentf-tests.el
+    -f buttercup-run-discover
+)
+
+exec $LE_EMACS $emacs_args
