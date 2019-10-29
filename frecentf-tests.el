@@ -20,7 +20,7 @@
 
 ;;; Commentary:
 
-;; this is a smoke test script that's meant to be run in the command line. It
+;; this is a smoke test script that's meant to be run in the command line.  It
 ;; checks that nothing is broken.
 
 ;;; Code:
