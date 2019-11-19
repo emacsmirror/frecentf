@@ -40,7 +40,10 @@
 
 ;;; Variables
 (persist-defvar frecentf-htable (make-hash-table :test 'equal)
-		"A-list of frecently opened files.")
+		"A-list of frecently opened files.
+
+path → frecent-struct/frecent info.")
+
 ;;; custom
 (defgroup frecentf nil
   "Maintain a menu of frecently opened files."
@@ -185,6 +188,9 @@ Returns a path as string, otherwise:
 	  (progn
 	    ;; `action' on pick
 	    (funcall action picked-file)
+	    ;; remove no-longer-existing files
+	    (unless (file-exists-p picked-file)
+	      (remhash picked-file frecentf-htable))
 	    ;; return the pick (no guarantee that `action' will do so)
 	    picked-file)
 	'no-pick))))
