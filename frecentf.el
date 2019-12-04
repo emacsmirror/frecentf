@@ -242,6 +242,7 @@ Mostly based off `recentf-mode'"
   (unless (and frecentf-mode (frecentf-enabled-p))
     (let ((hook-setup (if frecentf-mode 'add-hook 'remove-hook)))
       (dolist (hook '(find-file-hook
+		      after-save-hook
 		      write-file-functions))
         (apply hook-setup (list hook
 				'frecentf-track-opened-file)))
