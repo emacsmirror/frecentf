@@ -76,7 +76,7 @@ See also `frecentf--add-entry'."
   :type 'boolean)
 
 
-;;; functions
+;;; internal functions (not exposed as API)
 (defun frecentf-track-opened-file ()
   "Insert the name of the file just opened or written into the recent list.
 
