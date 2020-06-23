@@ -6,7 +6,7 @@
 ;; Homepage: https://launchpad.net/frecentf.el
 ;; Keywords: files maint
 ;; Package-Requires: ((emacs "26.1") (frecency "0.1-pre") (persist "0.4"))
-;; Version: 0.1
+;; Version: 0.2
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU Lesser General Public License as published by
