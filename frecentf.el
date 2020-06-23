@@ -118,10 +118,10 @@ If async is non-nil, use async package to check if should add dirname."
   (if async
       (async-start
        `(lambda ()
-          ,(async-inject-variables (rx line-start "tramp-")) ;; inherit tramp setup
           (let ((load-path ,load-path) ;; make frecenctf package available
                 (tramp-use-ssh-controlmaster-options nil) ;; avoid race conditions
                 (frecentf-also-store-dirname ,frecentf-also-store-dirname))
+            (load ,(locate-library "frecentf"))
             (require 'frecentf)
             (frecent-adding-list ,path)))
        add-list-to-code)
