@@ -105,11 +105,15 @@ tramp remote files in which `file-directory-p' is a costly operation."
          `((,path . dir))
        `((,path . file))))))
 
-(defun frecentf-add-path (path &optional async)
+(cl-defun frecentf-add-path (path &optional
+                                  (async (require 'async nil 'noerror)))
   "Add PATH and maybe its directory.
 
-If async is non-nil, use async package to check if should add dirname."
+If async is non-nil, use async package to check if should add dirname.
+
+By default, will add paths using async package if it's available."
   (let ((add-list-to-code
+         ;; code to add `frecentf-adding-list' results
          `(lambda (list-of-paths-and-types)
             (seq-map
              (lambda (path_type-of-path)
