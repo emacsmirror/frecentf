@@ -86,16 +86,48 @@ Based off `recentf-track-opened-file'"
   ;; Must return nil because it is run from `write-file-functions'.
   nil)
 
-(defun frecentf-add-path (path)
-  "Add PATH and maybe its directory."
-  (if-let* ((basename (file-name-directory path))
-	    (should-add-basename (and frecentf-also-store-dirname
-				      (file-directory-p basename))))
-      (frecentf--add-directory basename)) ;; add basename
-  ;; add the path, making distinction of whether it's a directory or file
-  (if (file-directory-p path)
-      (frecentf--add-directory path)
-    (frecentf--add-file path)))
+(defun frecent-adding-list (path)
+  "Decompose PATH into paths we should add.
+
+Returns a list of (path . type-of-path) that can be forwarded to `frecentf--add-entry'.
+
+This is a single function that can be used with the async package and
+tramp remote files in which `file-directory-p' is a costly operation."
+  (let ((path-is-dir (file-directory-p path)))
+    (append
+     (unless (or path-is-dir
+                 (not frecentf-also-store-dirname))
+       ;; add dirname of file path
+       (when-let ((path-dirname (file-name-directory path)))
+         `((,path-dirname . dir))))
+     (if path-is-dir
+         `((,path . dir))
+       `((,path . file))))))
+
+(defun frecentf-add-path (path &optional async)
+  "Add PATH and maybe its directory.
+
+If async is non-nil, use async package to check if should add dirname."
+  (let ((add-list-to-code
+         `(lambda (list-of-paths-and-types)
+            (seq-map
+             (lambda (path_type-of-path)
+               (cl-destructuring-bind (path . type-of-path) path_type-of-path
+                 (frecentf--add-entry path type-of-path)))
+             list-of-paths-and-types)))))
+  (if async
+      (async-start
+       `(lambda ()
+          ,(async-inject-variables (rx line-start "tramp-")) ;; inherit tramp setup
+          (let ((load-path ,load-path) ;; make frecenctf package available
+                (tramp-use-ssh-controlmaster-options nil) ;; avoid race conditions
+                (frecentf-also-store-dirname ,frecentf-also-store-dirname))
+            (require 'frecentf)
+            (frecent-adding-list ,path)))
+       add-list-to-code)
+    ;; synchronously
+    (funcall add-list-to-code
+             (frecent-adding-list path frecentf-also-store-dirname))))
 
 (defun frecentf--add-file (file-path)
   "Add FILE-PATH or update its timestamps if it's already been added."
