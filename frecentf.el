@@ -37,6 +37,7 @@
 (require 'persist)
 (require 'seq)
 (require 'subr-x)
+(declare-function async-start "async")
 
 ;;; Variables
 (persist-defvar frecentf-htable (make-hash-table :test 'equal)
