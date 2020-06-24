@@ -95,22 +95,27 @@ Based off `recentf-track-opened-file'"
   nil)
 
 (defun frecent-adding-list (path)
-  "Decompose PATH into paths we should add.
+  "Code to decompose PATH into paths we should add.
 
-Returns a list of (path . type-of-path) that can be forwarded to `frecentf--add-entry'.
+Code returns a list of (path . type-of-path) that can be forwarded to `frecentf--add-entry'.
 
-This is a single function that can be used with the async package and
+This is elisp code that can be used with the async package and
 tramp remote files in which `file-directory-p' is a costly operation."
-  (let ((path-is-dir (file-directory-p path)))
-    (append
-     (unless (or path-is-dir
-                 (not frecentf-also-store-dirname))
-       ;; add dirname of file path
-       (when-let ((path-dirname (file-name-directory path)))
-         `((,path-dirname . dir))))
-     (if path-is-dir
-         `((,path . dir))
-       `((,path . file))))))
+  `(let ((path-is-dir (file-directory-p ,path)))
+     (append
+      ;; maybe dirname
+      (unless (or path-is-dir
+                  (not ,frecentf-also-store-dirname))
+        ;; add dirname of file path
+        (when-let ((path-dirname (file-name-directory ,path)))
+          (list (cons path-dirname
+                      (quote dir)))))
+      ;; path itself
+      (if path-is-dir
+          (list (cons ,path
+                      (quote dir)))
+        (list (cons ,path
+                    (quote file)))))))
 
 (defun frecentf-add-path (path)
   "Add PATH and maybe its directory.
@@ -132,15 +137,13 @@ By default, will add paths using async package if it's available."
     (if use-async
         (async-start
          `(lambda ()
-            (let ((load-path (quote ,load-path))
-                  (tramp-use-ssh-controlmaster-options nil) ;; avoid race conditions
-                  (frecentf-also-store-dirname ,frecentf-also-store-dirname))
-              (require 'frecentf)
-              (frecent-adding-list ,path)))
+            (let ((tramp-use-ssh-controlmaster-options nil)) ;; avoid race conditions
+              ,(frecent-adding-list path)))
          add-list-to-code)
       ;; synchronously
       (funcall add-list-to-code
-               (frecent-adding-list path frecentf-also-store-dirname)))))
+               (eval
+                (frecent-adding-list path))))))
 
 (defun frecentf--add-file (file-path)
   "Add FILE-PATH or update its timestamps if it's already been added."
