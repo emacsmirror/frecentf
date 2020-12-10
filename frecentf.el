@@ -151,7 +151,9 @@ By default, will add paths using async package if it's available."
 
 (defun frecentf--add-directory (dir-path)
   "Add DIR-PATH or update its timestamps if it's already been added."
-  (frecentf--add-entry dir-path 'dir))
+  (frecentf--add-entry
+   (replace-regexp-in-string (rx "/" line-end) "" dir-path)
+   'dir))
 
 (defun frecentf--add-entry (path type-of-path)
   "Add a PATH to `frecentf-htable' with an associated TYPE-OF-PATH.
