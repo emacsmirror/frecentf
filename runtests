@@ -5,7 +5,8 @@ LE_EMACS=${EMACS:-emacs}
 
 emacs_args=(
     -Q -batch -nw
-    -l frecentf-tests.el
+    -L ./
+    -l frecentf-tests
     -f buttercup-run-discover
 )
 
