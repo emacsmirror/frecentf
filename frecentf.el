@@ -151,9 +151,7 @@ By default, will add paths using async package if it's available."
 
 (defun frecentf--add-directory (dir-path)
   "Add DIR-PATH or update its timestamps if it's already been added."
-  (frecentf--add-entry
-   (replace-regexp-in-string (rx "/" line-end) "" dir-path)
-   'dir))
+  (frecentf--add-entry dir-path 'dir))
 
 (defun frecentf--add-entry (path type-of-path)
   "Add a PATH to `frecentf-htable' with an associated TYPE-OF-PATH.
@@ -167,14 +165,19 @@ If PATH is prefixed by any of `frecentf-ignore-paths', it won't be added."
   (unless (seq-find (lambda (prefix)
 		      (string-prefix-p prefix path))
 		    frecentf-ignore-paths)
-    (let* ((original-entry (gethash path frecentf-htable
+    (let* ((actual-path
+            (if (eq type-of-path 'dir)
+                ;; remove trailing /
+                (replace-regexp-in-string (rx "/" line-end) "" path)
+              path))
+           (original-entry (gethash actual-path frecentf-htable
 				    (a-list :type type-of-path)))
 	   (updated-entry (frecency-update
 			    original-entry)))
       ;; ensure path has its type updated in the very rare cases it's changed
       (setf (alist-get :type updated-entry)
 	    type-of-path)
-      (puthash path updated-entry frecentf-htable))
+      (puthash actual-path updated-entry frecentf-htable))
     ;; entry added, ensure post-condition
     (frecentf--ensure-max-cap)))
 
