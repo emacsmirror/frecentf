@@ -5,7 +5,7 @@
 ;; Author: Felipe Lema <felipel@mortemale.org>
 ;; Homepage: https://launchpad.net/frecentf.el
 ;; Keywords: files maint
-;; Package-Requires: ((emacs "26.1") (frecency "0.1-pre") (persist "0.4"))
+;; Package-Requires: ((emacs "26.1") (frecency "0.1-pre") (persist "0.4") (async "1.9.4"))
 ;; Version: 0.2
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -30,6 +30,7 @@
 ;;   `frecentf-max-saved-items' is reached)
 
 ;;; Code:
+(require 'async)
 (require 'cl-lib)
 (require 'dirtrack)
 (require 'frecency)
@@ -37,7 +38,6 @@
 (require 'persist)
 (require 'seq)
 (require 'subr-x)
-(declare-function async-start "async")
 
 ;;; Variables
 (persist-defvar frecentf-htable (make-hash-table :test 'equal)
@@ -130,11 +130,8 @@ By default, will add paths using async package if it's available."
              (lambda (path_type-of-path)
                (cl-destructuring-bind (path . type-of-path) path_type-of-path
                  (frecentf--add-entry path type-of-path)))
-             list-of-paths-and-types)))
-        (use-async (and
-                    frecentf-use-async
-                    (require 'async nil 'noerror))))
-    (if use-async
+             list-of-paths-and-types))))
+    (if frecentf-use-async
         (async-start
          `(lambda ()
             (let ((tramp-use-ssh-controlmaster-options nil)) ;; avoid race conditions
@@ -242,10 +239,14 @@ Returns a path as string, otherwise:
 	    ;; `action' on pick
 	    (funcall action picked-file)
 	    ;; remove no-longer-existing files
-	    (unless (file-exists-p picked-file)
-	      (remhash picked-file frecentf-htable))
-	    ;; return the pick (no guarantee that `action' will do so)
-	    picked-file)
+            (async-start
+             `(lambda ()
+                (file-exists-p ,picked-file))
+             (lambda (picked-file-exists)
+               (unless picked-file-exists
+                 (remhash picked-file frecentf-htable)))
+             ;; return the pick (we have no guarantee that (action picked) will return picked)
+             picked-file)
 	'no-pick))))
 
 (defun frecentf-enabled-p ()
