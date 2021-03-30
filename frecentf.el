@@ -244,7 +244,7 @@ Returns a path as string, otherwise:
                 (file-exists-p ,picked-file))
              (lambda (picked-file-exists)
                (unless picked-file-exists
-                 (remhash picked-file frecentf-htable)))
+                 (remhash picked-file frecentf-htable))))
              ;; return the pick (we have no guarantee that (action picked) will return picked)
              picked-file)
 	'no-pick))))
