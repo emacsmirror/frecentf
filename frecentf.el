@@ -134,8 +134,11 @@ By default, will add paths using async package if it's available."
     (if frecentf-use-async
         (async-start
          `(lambda ()
-            (let ((tramp-use-ssh-controlmaster-options nil)) ;; avoid race conditions
-              ,(frecent-adding-list path)))
+            (set (if (version< emacs-version "30")
+                     'tramp-use-ssh-controlmaster-options
+                   'tramp-use-connection-share)
+                 nil)
+            ,(frecent-adding-list path))
          add-list-to-code)
       ;; synchronously
       (funcall add-list-to-code
